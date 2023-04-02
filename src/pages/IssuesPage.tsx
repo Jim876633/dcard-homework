@@ -1,23 +1,17 @@
+import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
+import { useUIContext } from '@src/context/useUIContext';
 import { GetIssueType } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Issue } from '../components/Issue';
 
-interface props {
-  setAccessToken: Dispatch<SetStateAction<string | null>>;
-}
-
-export const IssuesPage = ({ setAccessToken }: props) => {
-  const accessToken = useTokenContext();
-  const [issues, setIssues] = useState<GetIssueType[]>();
+export const IssuesPage = () => {
+  const { accessToken, setAccessToken } = useTokenContext();
+  const { messageContext } = useUIContext();
+  const { getIssues, issues } = useIssuesContext();
   const navigate = useNavigate();
 
   /**
@@ -29,15 +23,6 @@ export const IssuesPage = ({ setAccessToken }: props) => {
     localStorage.setItem('access_token', accessToken);
     setAccessToken(accessToken);
     navigate('/issues');
-  };
-
-  /**
-   * get user issues
-   * @param token
-   */
-  const getUserIssues = async (token: string) => {
-    const data = await githubApi.getUserIssues(token);
-    setIssues(data);
   };
 
   useEffect(() => {
@@ -52,16 +37,14 @@ export const IssuesPage = ({ setAccessToken }: props) => {
     } else {
       setAccessToken(localStorageToken);
     }
-  }, []);
-
-  useEffect(() => {
     if (accessToken) {
-      getUserIssues(accessToken);
+      getIssues(accessToken);
     }
   }, [accessToken]);
 
   return (
     <div>
+      {messageContext}
       {issues?.map(issue => (
         <Issue key={issue.id} issue={issue} />
       ))}

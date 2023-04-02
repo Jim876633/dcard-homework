@@ -1,9 +1,11 @@
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
+import { useUIContext } from '@src/context/useUIContext';
 import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Button, Form, Modal } from 'antd';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditForm } from './EditForm';
 import styled from './MoreAction.module.scss';
@@ -15,10 +17,13 @@ interface props {
 
 export const MoreAction = ({ issue, closeMoreAction }: props) => {
   const navigate = useNavigate();
-  const accessToken = useTokenContext();
+  const { accessToken } = useTokenContext();
+  const { showMessage } = useUIContext();
+  const { getIssues } = useIssuesContext();
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [updateIssueLoading, setUpdateIssueLoading] = useState(true);
+  const [updateIssueLoading, setUpdateIssueLoading] = useState(false);
   const [editForm] = Form.useForm();
+  const editModalRef = useRef<Boolean>(false);
 
   const updateParams = {
     owner: issue.repository.owner.login,
@@ -30,18 +35,47 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    * show edit modal
    */
   const editHandler = (): void => {
+    editModalRef.current = true;
     closeMoreAction();
     setIsOpenModal(true);
     // navigate(`/issues/detail/${issue.id}`, { state: issue });
   };
 
   /**
-   * delete issue
+   * show delete model
    */
   const deleteHandler = (): void => {
+    editModalRef.current = false;
+    closeMoreAction();
+    setIsOpenModal(true);
+  };
+
+  const onOKHandler = (): void => {
+    if (editModalRef.current) {
+      updateEditIssue();
+    } else {
+      closeIssue();
+    }
+  };
+
+  /**
+   * close the issue
+   */
+  const closeIssue = async () => {
+    setUpdateIssueLoading(true);
     if (accessToken) {
-      const updateIssue = { state: 'closed' };
-      githubApi.updateIssue(accessToken, updateIssue, updateParams);
+      const updateIssue: UpdateIssueType = { state: 'closed' };
+      const update = await githubApi.updateIssue(
+        accessToken,
+        updateIssue,
+        updateParams
+      );
+      if (update) {
+        await getIssues(accessToken as string);
+        showMessage('success', 'Close issue successfully');
+        setUpdateIssueLoading(false);
+        setIsOpenModal(false);
+      }
     }
   };
 
@@ -49,16 +83,19 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    * update edit issue
    */
   const updateEditIssue = async () => {
-    const editIssue = editForm.getFieldsValue(['title', 'body']);
     setUpdateIssueLoading(true);
+    const editIssue = editForm.getFieldsValue(['title', 'body']);
     const update = await githubApi.updateIssue(
       accessToken as string,
       editIssue,
       updateParams
     );
-    console.log(update);
-    setUpdateIssueLoading(false);
-    setIsOpenModal(false);
+    if (update) {
+      await getIssues(accessToken as string);
+      showMessage('success', 'Update issue successfully');
+      setUpdateIssueLoading(false);
+      setIsOpenModal(false);
+    }
   };
 
   const handleCancel = () => {
@@ -77,14 +114,18 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
       </Button>
       <Modal
         open={isOpenModal}
-        onOk={updateEditIssue}
+        onOk={onOKHandler}
         confirmLoading={updateIssueLoading}
         onCancel={handleCancel}
-        okText="Edit"
-        cancelText="Cancel"
+        okText={editModalRef.current ? 'Edit' : 'Yes'}
+        cancelText={editModalRef.current ? 'Cancel' : 'No'}
         centered
       >
-        <EditForm issue={issue} editForm={editForm} />
+        {editModalRef.current ? (
+          <EditForm issue={issue} editForm={editForm} />
+        ) : (
+          <div>Are you sure to close this issue?</div>
+        )}
       </Modal>
     </div>
   );

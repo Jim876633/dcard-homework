@@ -49,10 +49,11 @@ export const Issue = ({ issue }: props) => {
         content={<MoreAction issue={issue} closeMoreAction={closeMoreAction} />}
         trigger="click"
         open={openMoreAction}
+        onOpenChange={() => setOpenMoreAction(!openMoreAction)}
       >
         <Button
           className={styled.more_btn}
-          onClick={() => setOpenMoreAction(true)}
+          onClick={() => setOpenMoreAction(!openMoreAction)}
         >
           <MoreOutlined />
         </Button>
