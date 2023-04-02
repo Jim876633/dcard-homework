@@ -1,15 +1,15 @@
-import { useTokenContext } from "@src/context/useTokenContext";
-import { GetIssueType } from "@src/models/IssueType";
-import { githubApi } from "@src/services/github-api";
+import { useTokenContext } from '@src/context/useTokenContext';
+import { GetIssueType } from '@src/models/IssueType';
+import { githubApi } from '@src/services/github-api';
 import {
   Dispatch,
   SetStateAction,
   useContext,
   useEffect,
   useState,
-} from "react";
-import { useNavigate } from "react-router-dom";
-import { Issue } from "../components/Issue";
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Issue } from '../components/Issue';
 
 interface props {
   setAccessToken: Dispatch<SetStateAction<string | null>>;
@@ -26,9 +26,9 @@ export const IssuesPage = ({ setAccessToken }: props) => {
    */
   const getAcessToken = async (code: string) => {
     const accessToken = await githubApi.getAccessToken(code);
-    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem('access_token', accessToken);
     setAccessToken(accessToken);
-    navigate("/issues");
+    navigate('/issues');
   };
 
   /**
@@ -41,11 +41,11 @@ export const IssuesPage = ({ setAccessToken }: props) => {
   };
 
   useEffect(() => {
-    const localStorageToken = localStorage.getItem("access_token");
+    const localStorageToken = localStorage.getItem('access_token');
     if (!localStorageToken) {
       const query = window.location.search;
       const params = new URLSearchParams(query);
-      const queryUrl = params.get("code");
+      const queryUrl = params.get('code');
       if (queryUrl) {
         getAcessToken(queryUrl as string);
       }
@@ -62,7 +62,7 @@ export const IssuesPage = ({ setAccessToken }: props) => {
 
   return (
     <div>
-      {issues?.map((issue) => (
+      {issues?.map(issue => (
         <Issue key={issue.id} issue={issue} />
       ))}
     </div>

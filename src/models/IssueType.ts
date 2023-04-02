@@ -2,7 +2,7 @@ export class UpdateIssueType {
   title?: string;
   body?: string;
   labels?: string | undefined[];
-  state?: string = "open" || "closed";
+  state?: string = 'open' || 'closed';
   assignees?: UserType[];
 }
 

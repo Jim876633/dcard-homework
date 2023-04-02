@@ -1,12 +1,12 @@
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useTokenContext } from "@src/context/useTokenContext";
-import { GetIssueType, UpdateIssueType } from "@src/models/IssueType";
-import { githubApi } from "@src/services/github-api";
-import { Button, Form, Modal } from "antd";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { EditForm } from "./EditForm";
-import styled from "./MoreAction.module.scss";
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useTokenContext } from '@src/context/useTokenContext';
+import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
+import { githubApi } from '@src/services/github-api';
+import { Button, Form, Modal } from 'antd';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { EditForm } from './EditForm';
+import styled from './MoreAction.module.scss';
 
 interface props {
   issue: GetIssueType;
@@ -40,7 +40,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    */
   const deleteHandler = (): void => {
     if (accessToken) {
-      const updateIssue = { state: "closed" };
+      const updateIssue = { state: 'closed' };
       githubApi.updateIssue(accessToken, updateIssue, updateParams);
     }
   };
@@ -49,7 +49,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    * update edit issue
    */
   const updateEditIssue = async () => {
-    const editIssue = editForm.getFieldsValue(["title", "body"]);
+    const editIssue = editForm.getFieldsValue(['title', 'body']);
     setUpdateIssueLoading(true);
     const update = await githubApi.updateIssue(
       accessToken as string,

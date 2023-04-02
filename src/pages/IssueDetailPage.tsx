@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const IssueDetailPage = () => {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ export const IssueDetailPage = () => {
   console.log(issueDetail);
   useEffect(() => {
     if (!issueDetail) {
-      navigate("/issues");
+      navigate('/issues');
     }
   }, [issueDetail]);
 

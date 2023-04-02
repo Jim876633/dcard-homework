@@ -1,9 +1,9 @@
-import styled from "./Issue.module.scss";
-import { Select, Card, Avatar, Button, Popover } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
-import { GetIssueType } from "@src/models/IssueType";
-import { useState } from "react";
-import { MoreAction } from "./MoreAction";
+import styled from './Issue.module.scss';
+import { Select, Card, Avatar, Button, Popover } from 'antd';
+import { MoreOutlined } from '@ant-design/icons';
+import { GetIssueType } from '@src/models/IssueType';
+import { useState } from 'react';
+import { MoreAction } from './MoreAction';
 
 interface props {
   issue: GetIssueType;
@@ -31,16 +31,16 @@ export const Issue = ({ issue }: props) => {
         style={{ width: 100 }}
         options={[
           {
-            value: "open",
-            label: "Open",
+            value: 'open',
+            label: 'Open',
           },
           {
-            value: "progess",
-            label: "In Progress",
+            value: 'progess',
+            label: 'In Progress',
           },
           {
-            value: "done",
-            label: "Done",
+            value: 'done',
+            label: 'Done',
           },
         ]}
       />

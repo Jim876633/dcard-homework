@@ -1,4 +1,4 @@
-import { GetIssueType, UpdateIssueType } from "@src/models/IssueType";
+import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
 
 /**
  * get access token
@@ -6,7 +6,7 @@ import { GetIssueType, UpdateIssueType } from "@src/models/IssueType";
  * @return access token
  */
 const getAccessToken = async (code: string) => {
-  const res = await fetch("/githubOauth/getAccessToken?code=" + code);
+  const res = await fetch('/githubOauth/getAccessToken?code=' + code);
   const accessToken = await res.json();
   return accessToken;
 };
@@ -17,9 +17,9 @@ const getAccessToken = async (code: string) => {
  * @return issues
  */
 const getUserIssues = async (token: string) => {
-  const res = await fetch("/githubOauth/getUserIssues", {
-    method: "GET",
-    headers: { Authorization: "Bearer " + token },
+  const res = await fetch('/githubOauth/getUserIssues', {
+    method: 'GET',
+    headers: { Authorization: 'Bearer ' + token },
   });
   const data = await res.json();
   const formatData: GetIssueType[] = data.map((issue: GetIssueType) => {
@@ -56,10 +56,10 @@ const updateIssue = async (
   const res = await fetch(
     `/githubOauth/updateIssue/${UpdateParams.owner}/${UpdateParams.repo}/${UpdateParams.issueNumber}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        Authorization: "Bearer " + token,
-        "content-type": "application/json",
+        Authorization: 'Bearer ' + token,
+        'content-type': 'application/json',
       },
       body: JSON.stringify(issue),
     }
@@ -83,8 +83,8 @@ const searchIssues = async (
   const res = await fetch(
     `/githubOauth/search/${searchParams.user}/${searchParams.repo}/${query}`,
     {
-      method: "GET",
-      headers: { Authorization: "Bearer " + token },
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + token },
     }
   );
   const data = await res.json();
@@ -117,8 +117,8 @@ const createIssue = async (
   const res = await fetch(
     `/githubOauth/create/${createParams.owner}/${createParams.repo}`,
     {
-      method: "GET",
-      headers: { Authorization: "Bearer " + token },
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + token },
       body: JSON.stringify(Issue),
     }
   );

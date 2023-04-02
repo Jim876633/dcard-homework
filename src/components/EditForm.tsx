@@ -1,5 +1,5 @@
-import { GetIssueType } from "@src/models/IssueType";
-import { Form, Input, FormInstance } from "antd";
+import { GetIssueType } from '@src/models/IssueType';
+import { Form, Input, FormInstance } from 'antd';
 
 interface props {
   issue: GetIssueType;
@@ -8,8 +8,8 @@ interface props {
 
 export const EditForm = ({ issue, editForm }: props) => {
   const fields = [
-    { name: "title", value: issue.title },
-    { name: "body", value: issue.body },
+    { name: 'title', value: issue.title },
+    { name: 'body', value: issue.body },
   ];
 
   return (
@@ -18,7 +18,7 @@ export const EditForm = ({ issue, editForm }: props) => {
         label="Title"
         name="title"
         required
-        rules={[{ required: true, message: "Title is required" }]}
+        rules={[{ required: true, message: 'Title is required' }]}
       >
         <Input placeholder="Please text some title" />
       </Form.Item>
