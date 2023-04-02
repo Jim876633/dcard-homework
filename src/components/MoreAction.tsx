@@ -2,7 +2,7 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { useUIContext } from '@src/context/useUIContext';
-import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
+import { GetIssueType, RepoType, UpdateIssueType } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Button, Form, Modal } from 'antd';
 import { useRef, useState } from 'react';
@@ -26,7 +26,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
   const editModalRef = useRef<Boolean>(false);
 
   const updateParams = {
-    owner: issue.repository.owner.login,
+    owner: issue.user.accountName,
     repo: issue.repository.name,
     issueNumber: issue.number,
   };

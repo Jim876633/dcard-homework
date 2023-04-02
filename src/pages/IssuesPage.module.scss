@@ -1,0 +1,8 @@
+@import '@styles/_variables.scss';
+.container {
+  width: 50rem;
+  height: 50rem;
+  margin: 5% auto;
+  border: 1px solid red;
+  overflow-y: auto;
+}

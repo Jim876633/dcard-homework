@@ -1,4 +1,33 @@
-import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
+import { GetIssueType, RepoType, UpdateIssueType } from '@src/models/IssueType';
+import { UserType } from '@src/models/UserType';
+
+const formatUser = (user: any): UserType | UserType[] => {
+  if (user instanceof Array) {
+    return user.map((user: any) => {
+      return {
+        id: user.id,
+        name: user.name,
+        accountName: user.login,
+        avatarUrl: user.avatar_url,
+      };
+    });
+  }
+  return {
+    id: user.id,
+    name: user.name,
+    accountName: user.login,
+    avatarUrl: user.avatar_url,
+  };
+};
+
+const formatRepo = (repo: any) => {
+  return {
+    id: repo.id,
+    name: repo.name,
+    private: repo.private,
+    open_issues_count: repo.open_issues_count,
+  };
+};
 
 /**
  * get access token
@@ -12,6 +41,21 @@ const getAccessToken = async (code: string) => {
 };
 
 /**
+ * get user
+ * @param token
+ * @returns
+ */
+const getUser = async (token: string) => {
+  const res = await fetch('/githubOauth/getUser', {
+    method: 'GET',
+    headers: { Authorization: 'bearer ' + token },
+  });
+  const data = await res.json();
+  const formattedUser = formatUser(data) as UserType;
+  return formattedUser;
+};
+
+/**
  * get user issues
  * @param token
  * @return issues
@@ -22,23 +66,31 @@ const getUserIssues = async (token: string) => {
     headers: { Authorization: 'Bearer ' + token },
   });
   const data = await res.json();
-  const formatData: GetIssueType[] = data.map((issue: GetIssueType) => {
-    return {
-      id: issue.id,
-      number: issue.number,
-      title: issue.title,
-      body: issue.body,
-      labels: issue.labels,
-      state: issue.state,
-      user: issue.user,
-      assignees: issue.assignees,
-      created_at: issue.created_at,
-      updated_at: issue.updated_at,
-      closed_at: issue.closed_at,
-      repository: issue.repository,
-    };
-  });
-  return formatData;
+  if (data) {
+    const formattedIssue: GetIssueType[] = data.map((issue: any) => {
+      const formattAssignees: UserType[] = formatUser(
+        issue.assignees
+      ) as UserType[];
+      const formattedUser: UserType = formatUser(issue.user) as UserType;
+      const formattedRepo: RepoType = formatRepo(issue.repository);
+      return {
+        id: issue.id,
+        number: issue.number,
+        title: issue.title,
+        body: issue.body,
+        labels: issue.labels,
+        state: issue.state,
+        user: formattedUser,
+        assignees: formattAssignees,
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+        closed_at: issue.closed_at,
+        repository: formattedRepo,
+      };
+    });
+    return formattedIssue;
+  }
+  return [];
 };
 
 /**
@@ -69,7 +121,7 @@ const updateIssue = async (
 };
 
 /**
- *
+ * search issues
  * @param token
  * @param query
  * @param searchParams
@@ -79,17 +131,24 @@ const searchIssues = async (
   token: string,
   query: string,
   searchParams: SearchParamsType
-): Promise<GetIssueType | undefined> => {
+) => {
+  const repoParams = searchParams.repo ? `repo=${searchParams.repo}&` : '';
+  const userParams = searchParams.user ? `user=${searchParams.user}&` : '';
+  const queryParams = query ? `query=${query}&` : '';
   const res = await fetch(
-    `/githubOauth/search/${searchParams.user}/${searchParams.repo}/${query}`,
+    `/githubOauth/search?${repoParams}${userParams}${queryParams}`,
     {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + token },
     }
   );
   const data = await res.json();
-  if (data?.items) {
-    const searchList = data.items.map((issue: GetIssueType) => {
+  if (data && data.items && data.total_count > 0) {
+    const searchIssues = data.items.map((issue: GetIssueType) => {
+      const formattAssignees: UserType[] = formatUser(
+        issue.assignees
+      ) as UserType[];
+      const formattedUser: UserType = formatUser(issue.user) as UserType;
       return {
         id: issue.id,
         number: issue.number,
@@ -97,18 +156,27 @@ const searchIssues = async (
         body: issue.body,
         labels: issue.labels,
         state: issue.state,
-        user: issue.user,
-        assignees: issue.assignees,
+        user: formattedUser,
+        assignees: formattAssignees,
         created_at: issue.created_at,
         updated_at: issue.updated_at,
         closed_at: issue.closed_at,
-        repository: issue.repository,
+        repository: {
+          name: issue.repository_url?.split('/').slice(-1).join(''),
+        },
       };
     });
-    return searchList;
+    return searchIssues;
   }
+  return [];
 };
 
+/**
+ * create a Issue
+ * @param token
+ * @param Issue
+ * @param createParams
+ */
 const createIssue = async (
   token: string,
   Issue: UpdateIssueType,
@@ -128,6 +196,7 @@ const createIssue = async (
 
 export const githubApi = {
   getAccessToken,
+  getUser,
   getUserIssues,
   updateIssue,
   searchIssues,
@@ -136,7 +205,7 @@ export const githubApi = {
 
 interface SearchParamsType {
   user: string;
-  repo: string;
+  repo?: string;
 }
 
 interface CreateParamsType {

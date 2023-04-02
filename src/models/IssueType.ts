@@ -1,3 +1,4 @@
+import { UserType } from './UserType';
 export type UpdateIssueType = {
   title?: string;
   body?: string;
@@ -9,29 +10,20 @@ export type UpdateIssueType = {
 export interface GetIssueType extends UpdateIssueType {
   id: number;
   number: number;
-  user: UserType;
   created_at: string;
   updated_at: string;
   closed_at: string | null;
-  repository: RepositoryType;
+  repository: RepoType;
+  repository_url?: string;
+  user: UserType;
 }
 
 /**
- * user interface
+ * repository type
  */
-type UserType = {
-  login: string;
-  id: number;
-  avatar_url: string;
-};
-
-/**
- * repository interface
- */
-type RepositoryType = {
-  id: number;
+export type RepoType = {
+  id?: number;
   name: string;
-  private: boolean;
-  owner: UserType;
-  open_issues_count: number;
+  private?: boolean;
+  open_issues_count?: number;
 };

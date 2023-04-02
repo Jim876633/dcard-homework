@@ -19,9 +19,11 @@ export const Issue = ({ issue }: props) => {
   };
 
   return (
-    <Card style={{ width: 400, marginTop: 16 }} loading={isLoading}>
+    <Card style={{ width: '100%', marginTop: 16 }} loading={isLoading}>
       <Meta
-        avatar={<Avatar src={issue.user.avatar_url} alt={issue.user.login} />}
+        avatar={
+          <Avatar src={issue.user.avatarUrl} alt={issue.user.accountName} />
+        }
         title={issue.title}
         description={issue.body}
       />
