@@ -1,4 +1,9 @@
-import { GetIssueType, RepoType, UpdateIssueType } from '@src/models/IssueType';
+import {
+  GetIssueType,
+  RepoType,
+  UpdateIssueType,
+  UpdateLabelsType,
+} from '@src/models/IssueType';
 import { UserType } from '@src/models/UserType';
 
 const formatUser = (user: any): UserType | UserType[] => {
@@ -121,6 +126,33 @@ const updateIssue = async (
 };
 
 /**
+ * set issue labels
+ * @param token
+ * @param issue
+ * @param UpdateParams
+ * @returns After update issue
+ */
+const updateIssueLabels = async (
+  token: string,
+  labels: UpdateLabelsType,
+  UpdateParams: UpdateParamsType
+) => {
+  const res = await fetch(
+    `/githubOauth/setLabels/${UpdateParams.owner}/${UpdateParams.repo}/${UpdateParams.issueNumber}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(labels),
+    }
+  );
+  const data = await res.json();
+  return data;
+};
+
+/**
  * search issues
  * @param token
  * @param query
@@ -144,7 +176,7 @@ const searchIssues = async (
   );
   const data = await res.json();
   if (data && data.items && data.total_count > 0) {
-    const searchIssues = data.items.map((issue: GetIssueType) => {
+    const searchIssues = data.items.map((issue: any) => {
       const formattAssignees: UserType[] = formatUser(
         issue.assignees
       ) as UserType[];
@@ -199,6 +231,7 @@ export const githubApi = {
   getUser,
   getUserIssues,
   updateIssue,
+  updateIssueLabels,
   searchIssues,
   createIssue,
 };
