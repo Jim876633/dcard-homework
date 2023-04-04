@@ -2,7 +2,7 @@ import { UserType } from './UserType';
 export type UpdateIssueType = {
   title?: string;
   body?: string;
-  labels?: (string | undefined)[];
+  labels?: LabelItem[];
   state?: 'open' | 'closed';
   assignees?: UserType[];
 };
@@ -16,6 +16,7 @@ export interface GetIssueType extends UpdateIssueType {
   repository: RepoType;
   repository_url?: string;
   user: UserType;
+  labels: GetLabelType[];
 }
 
 /**
@@ -26,4 +27,32 @@ export type RepoType = {
   name: string;
   private?: boolean;
   open_issues_count?: number;
+};
+
+/**
+ * get label type
+ */
+export type GetLabelType = {
+  color: string;
+  default: boolean;
+  description: string;
+  id: number;
+  name: LabelName;
+  node_id: string;
+  url: string;
+};
+
+/**
+ * update label type
+ */
+export type UpdateLabelsType = {
+  labels: string[];
+};
+
+export type LabelName = 'open' | 'in progress' | 'done';
+
+export type LabelItem = {
+  name: string;
+  color: string;
+  description: string;
 };

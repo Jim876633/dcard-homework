@@ -63,10 +63,11 @@ const getUser = async (token: string) => {
 /**
  * get user issues
  * @param token
+ * @param page
  * @return issues
  */
-const getUserIssues = async (token: string) => {
-  const res = await fetch('/githubOauth/getUserIssues', {
+const getUserIssues = async (token: string, page: number) => {
+  const res = await fetch(`/githubOauth/getUserIssues/${page}`, {
     method: 'GET',
     headers: { Authorization: 'Bearer ' + token },
   });

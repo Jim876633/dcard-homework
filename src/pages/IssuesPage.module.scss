@@ -1,8 +1,14 @@
 @import '@styles/_variables.scss';
 .container {
-  width: 50rem;
-  height: 50rem;
-  margin: 5% auto;
-  border: 1px solid red;
-  overflow-y: auto;
+  width: 80%;
+  margin: auto;
+  padding-top: 5rem;
+  .issues {
+    width: 50rem;
+    height: 20rem;
+    margin: 5% auto;
+    border: 1px solid red;
+    padding: 0 1rem;
+    overflow-y: auto;
+  }
 }
