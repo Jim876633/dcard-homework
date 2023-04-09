@@ -1,18 +1,23 @@
+import { SearchOutlined } from '@ant-design/icons';
+import { CreateForm } from '@src/components/CreateForm';
 import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { useUIContext } from '@src/context/useUIContext';
 import { githubApi } from '@src/services/github-api';
+import { Button, Divider, Form, Input, List, Modal, Skeleton } from 'antd';
 import { useEffect, useRef, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { Issue } from '../components/Issue';
-import { Divider, Input, List, Skeleton } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from './IssuesPage.module.scss';
+import { CreateIssueType } from '@src/models/IssueType';
 
 export const IssuesPage = () => {
   const { accessToken, setAccessToken } = useTokenContext();
-  const { messageContext } = useUIContext();
+  const { messageContext, showMessage } = useUIContext();
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [createForm] = Form.useForm();
+  const editModalRef = useRef<Boolean>(false);
   const {
     getIssues,
     issues,
@@ -24,6 +29,10 @@ export const IssuesPage = () => {
     hasMoreRef,
   } = useIssuesContext();
   const [isLoading, setIsLoading] = useState(false);
+  const [updateIssueLoading, setUpdateIssueLoading] = useState(false);
+
+  const validRepos = [...new Set(issues.map(issue => issue.repository.name))];
+
   const navigate = useNavigate();
   let fetchTimeID: any;
 
@@ -71,6 +80,47 @@ export const IssuesPage = () => {
     }
   };
 
+  /**
+   * create an issue
+   */
+  const createIssue = async () => {
+    try {
+      const issue: CreateIssueType = await createForm.validateFields();
+      setUpdateIssueLoading(true);
+
+      const createParams = {
+        owner: user?.accountName as string,
+        repo: issue.repo as string,
+      };
+      delete issue['repo'];
+      const createIssue = await githubApi.createIssue(
+        accessToken as string,
+        issue,
+        createParams
+      );
+      if (createIssue) {
+        await getIssues(accessToken as string);
+        showMessage('success', 'Create an issue successfully');
+        setUpdateIssueLoading(false);
+        setIsOpenModal(false);
+      }
+    } catch {
+      return;
+    }
+  };
+
+  const openModal = () => {
+    setIsOpenModal(true);
+  };
+
+  const onOKHandler = () => {
+    createIssue();
+  };
+
+  const handleCancel = () => {
+    setIsOpenModal(false);
+  };
+
   useEffect(() => {
     setIsLoading(true);
     const localStorageToken = localStorage.getItem('access_token');
@@ -103,11 +153,6 @@ export const IssuesPage = () => {
         onChange={onChangeHandler}
       />
       {messageContext}
-      {/* <div className={styled.issues}>
-        {issues?.map(issue => (
-          <Issue key={issue.id} issue={issue} />
-        ))}
-      </div> */}
       <div className={styled.issues} id="scrollableDiv">
         <InfiniteScroll
           dataLength={issues.length}
@@ -134,63 +179,18 @@ export const IssuesPage = () => {
           />
         </InfiniteScroll>
       </div>
+      <Modal
+        open={isOpenModal}
+        onOk={onOKHandler}
+        confirmLoading={updateIssueLoading}
+        onCancel={handleCancel}
+        okText={'Create'}
+        cancelText={'Cancel'}
+        centered
+      >
+        <CreateForm createForm={createForm} repos={validRepos} />
+      </Modal>
+      <Button onClick={openModal}>Creat issues</Button>
     </div>
   );
 };
-
-{
-  /* <List
-className="demo-loadmore-list"
-loading={initLoading}
-itemLayout="horizontal"
-loadMore={loadMore}
-dataSource={list}
-renderItem={(item) => (
-  <List.Item
-    actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-  >
-    <Skeleton avatar title={false} loading={item.loading} active>
-      <List.Item.Meta
-        avatar={<Avatar src={item.picture.large} />}
-        title={<a href="https://ant.design">{item.name?.last}</a>}
-        description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-      />
-      <div>content</div>
-    </Skeleton>
-  </List.Item>
-)}
-/>
-
-<div
-id="scrollableDiv"
-style={{
-  height: 400,
-  overflow: 'auto',
-  padding: '0 16px',
-  border: '1px solid rgba(140, 140, 140, 0.35)',
-}}
->
-<InfiniteScroll
-  dataLength={data.length}
-  next={loadMoreData}
-  hasMore={data.length < 50}
-  loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-  endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-  scrollableTarget="scrollableDiv"
->
-  <List
-    dataSource={data}
-    renderItem={(item) => (
-      <List.Item key={item.email}>
-        <List.Item.Meta
-          avatar={<Avatar src={item.picture.large} />}
-          title={<a href="https://ant.design">{item.name.last}</a>}
-          description={item.email}
-        />
-        <div>Content</div>
-      </List.Item>
-    )}
-  />
-</InfiniteScroll>
-</div> */
-}

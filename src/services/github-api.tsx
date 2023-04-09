@@ -212,15 +212,18 @@ const searchIssues = async (
  */
 const createIssue = async (
   token: string,
-  Issue: UpdateIssueType,
+  issue: UpdateIssueType,
   createParams: CreateParamsType
 ) => {
   const res = await fetch(
     `/githubOauth/create/${createParams.owner}/${createParams.repo}`,
     {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + token },
-      body: JSON.stringify(Issue),
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(issue),
     }
   );
   const data = await res.json();

@@ -1,17 +1,14 @@
 import { GetIssueType } from '@src/models/IssueType';
-import { Form, Input, FormInstance } from 'antd';
+import { Form, FormInstance, Input } from 'antd';
+import { FieldData } from 'rc-field-form/lib/interface';
 
 interface props {
+  fields: FieldData[];
   issue: GetIssueType;
   editForm: FormInstance;
 }
 
-export const EditForm = ({ issue, editForm }: props) => {
-  const fields = [
-    { name: 'title', value: issue.title },
-    { name: 'body', value: issue.body },
-  ];
-
+export const EditForm = ({ fields, issue, editForm }: props) => {
   return (
     <Form layout="vertical" fields={fields} form={editForm}>
       <Form.Item

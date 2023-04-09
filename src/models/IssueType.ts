@@ -56,3 +56,9 @@ export type LabelItem = {
   color: string;
   description: string;
 };
+
+export type CreateIssueType = {
+  title: string;
+  body: string;
+  repo?: string;
+};

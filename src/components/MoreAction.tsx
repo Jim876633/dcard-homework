@@ -5,7 +5,7 @@ import { useUIContext } from '@src/context/useUIContext';
 import { GetIssueType, RepoType, UpdateIssueType } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Button, Form, Modal } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditForm } from './EditForm';
 import styled from './MoreAction.module.scss';
@@ -16,6 +16,10 @@ interface props {
 }
 
 export const MoreAction = ({ issue, closeMoreAction }: props) => {
+  const initialFormValues = [
+    { name: 'title', value: issue.title },
+    { name: 'body', value: issue.body },
+  ];
   const navigate = useNavigate();
   const { accessToken } = useTokenContext();
   const { showMessage } = useUIContext();
@@ -23,7 +27,8 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [updateIssueLoading, setUpdateIssueLoading] = useState(false);
   const [editForm] = Form.useForm();
-  const editModalRef = useRef<Boolean>(false);
+  const editModalRef = useRef(false);
+  const fieldsRef = useRef(initialFormValues);
 
   const updateParams = {
     owner: issue.user.accountName,
@@ -48,14 +53,6 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
     editModalRef.current = false;
     closeMoreAction();
     setIsOpenModal(true);
-  };
-
-  const onOKHandler = (): void => {
-    if (editModalRef.current) {
-      updateEditIssue();
-    } else {
-      closeIssue();
-    }
   };
 
   /**
@@ -83,22 +80,37 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    * update edit issue
    */
   const updateEditIssue = async () => {
-    setUpdateIssueLoading(true);
-    const editIssue = editForm.getFieldsValue(['title', 'body']);
-    const update = await githubApi.updateIssue(
-      accessToken as string,
-      editIssue,
-      updateParams
-    );
-    if (update) {
-      await getIssues(accessToken as string);
-      showMessage('success', 'Update issue successfully');
-      setUpdateIssueLoading(false);
-      setIsOpenModal(false);
+    try {
+      const editIssue = await editForm.validateFields();
+      fieldsRef.current = [editIssue];
+      setUpdateIssueLoading(true);
+      const updateIssue = await githubApi.updateIssue(
+        accessToken as string,
+        editIssue,
+        updateParams
+      );
+      if (updateIssue) {
+        await getIssues(accessToken as string);
+        showMessage('success', 'Update issue successfully');
+        setUpdateIssueLoading(false);
+        setIsOpenModal(false);
+      }
+    } catch (err) {
+      return;
+    }
+  };
+
+  const onOKHandler = () => {
+    if (editModalRef.current) {
+      updateEditIssue();
+    } else {
+      closeIssue();
     }
   };
 
   const handleCancel = () => {
+    fieldsRef.current = initialFormValues;
+    editForm.resetFields();
     setIsOpenModal(false);
   };
 
@@ -122,7 +134,11 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
         centered
       >
         {editModalRef.current ? (
-          <EditForm issue={issue} editForm={editForm} />
+          <EditForm
+            fields={fieldsRef.current}
+            issue={issue}
+            editForm={editForm}
+          />
         ) : (
           <div>Are you sure to close this issue?</div>
         )}
