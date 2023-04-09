@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths(), styleTsconfigPaths()],
   server: {
     proxy: {
-      '/githubOauth': 'http://localhost:3000/',
+      '/githubOauth':
+        'https://jim-issues-tracker-server.netlify.app/.netlify/functions/server/',
     },
   },
 });

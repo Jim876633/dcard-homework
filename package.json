@@ -1,16 +1,19 @@
 {
-  "name": "dcard-homework",
+  "name": "issues-tracker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "vite",
+    "start:dev": "node --watch local-server.js & vite",
+    "start:prod": "vite --config vite.config.prod.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "server": "node --watch server.js"
+    "server": "node --watch local-server.js"
   },
   "dependencies": {
     "antd": "^5.3.2",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "node-fetch": "^3.3.1",
     "react": "^18.2.0",
