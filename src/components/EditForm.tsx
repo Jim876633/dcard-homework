@@ -4,11 +4,10 @@ import { FieldData } from 'rc-field-form/lib/interface';
 
 interface props {
   fields: FieldData[];
-  issue: GetIssueType;
   editForm: FormInstance;
 }
 
-export const EditForm = ({ fields, issue, editForm }: props) => {
+export const EditForm = ({ fields, editForm }: props) => {
   return (
     <Form layout="vertical" fields={fields} form={editForm}>
       <Form.Item

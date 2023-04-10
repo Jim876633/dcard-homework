@@ -1,11 +1,11 @@
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { useUIContext } from '@src/context/useUIContext';
-import { GetIssueType, RepoType, UpdateIssueType } from '@src/models/IssueType';
+import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Button, Form, Modal } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditForm } from './EditForm';
 import styled from './MoreAction.module.scss';
@@ -134,11 +134,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
         centered
       >
         {editModalRef.current ? (
-          <EditForm
-            fields={fieldsRef.current}
-            issue={issue}
-            editForm={editForm}
-          />
+          <EditForm fields={fieldsRef.current} editForm={editForm} />
         ) : (
           <div>Are you sure to close this issue?</div>
         )}

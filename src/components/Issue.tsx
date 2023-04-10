@@ -4,7 +4,7 @@ import { LabelEnum } from '@src/enums/labelEnum';
 import { GetIssueType, LabelName } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Avatar, Button, Card, List, Popover, Select } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from './Issue.module.scss';
 import { MoreAction } from './MoreAction';
 
@@ -95,48 +95,5 @@ export const Issue = ({ issue }: props) => {
         </Button>
       </Popover>
     </List.Item>
-    // <Card style={{ width: '100%', marginTop: 16 }} loading={isLoading}>
-    //   <Meta
-    //     avatar={
-    //       <Avatar src={issue.user.avatarUrl} alt={issue.user.accountName} />
-    //     }
-    //     title={issue.title}
-    //     description={issue.body}
-    //   />
-    //   <Select
-    //     className={styled.select}
-    //     defaultValue={issue.labels[0]?.name || LabelEnum.OPEN}
-    //     style={{ width: 150 }}
-    //     onChange={selectChangeHandler}
-    //     options={[
-    //       {
-    //         value: LabelEnum.OPEN,
-    //         label: LabelEnum.OPEN,
-    //       },
-    //       {
-    //         value: LabelEnum.IN_PROGRESS,
-    //         label: LabelEnum.IN_PROGRESS,
-    //       },
-    //       {
-    //         value: LabelEnum.DONE,
-    //         label: LabelEnum.DONE,
-    //       },
-    //     ]}
-    //   />
-    //   <Popover
-    //     placement="bottom"
-    //     content={<MoreAction issue={issue} closeMoreAction={closeMoreAction} />}
-    //     trigger="click"
-    //     open={openMoreAction}
-    //     onOpenChange={() => setOpenMoreAction(!openMoreAction)}
-    //   >
-    //     <Button
-    //       className={styled.more_btn}
-    //       onClick={() => setOpenMoreAction(!openMoreAction)}
-    //     >
-    //       <MoreOutlined />
-    //     </Button>
-    //   </Popover>
-    // </Card>
   );
 };
