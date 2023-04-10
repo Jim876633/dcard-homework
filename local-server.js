@@ -119,7 +119,7 @@ app.post(`${baseUrl}/create/:owner/:repo`, async function (req, res) {
       body: JSON.stringify(req.body),
     }
   );
-  const data = response.json();
+  const data = await response.json();
   res.json(data);
 });
 
@@ -141,7 +141,7 @@ app.put(
         body: JSON.stringify(req.body),
       }
     );
-    const data = response.json();
+    const data = await response.json();
     res.json(data);
   }
 );
