@@ -3,10 +3,10 @@ import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { useUIContext } from '@src/context/useUIContext';
 import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
+import { ModalType } from '@src/models/ModalType';
 import { githubApi } from '@src/services/github-api';
-import { Button, Form, Modal } from 'antd';
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, Form } from 'antd';
+import { useRef } from 'react';
 import { EditForm } from './EditForm';
 import styled from './MoreAction.module.scss';
 
@@ -20,14 +20,16 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
     { name: 'title', value: issue.title },
     { name: 'body', value: issue.body },
   ];
-  const navigate = useNavigate();
   const { accessToken } = useTokenContext();
-  const { showMessage } = useUIContext();
+  const {
+    showMessage,
+    closeModal,
+    openModal,
+    openModalConfirmLoading,
+    closeModalConfirmLoading,
+  } = useUIContext();
   const { getIssues } = useIssuesContext();
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [updateIssueLoading, setUpdateIssueLoading] = useState(false);
   const [editForm] = Form.useForm();
-  const editModalRef = useRef(false);
   const fieldsRef = useRef(initialFormValues);
 
   const updateParams = {
@@ -37,29 +39,10 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
   };
 
   /**
-   * show edit modal
-   */
-  const editHandler = (): void => {
-    editModalRef.current = true;
-    closeMoreAction();
-    setIsOpenModal(true);
-    // navigate(`/issues/detail/${issue.id}`, { state: issue });
-  };
-
-  /**
-   * show delete model
-   */
-  const deleteHandler = (): void => {
-    editModalRef.current = false;
-    closeMoreAction();
-    setIsOpenModal(true);
-  };
-
-  /**
    * close the issue
    */
   const closeIssue = async () => {
-    setUpdateIssueLoading(true);
+    openModalConfirmLoading();
     if (accessToken) {
       const updateIssue: UpdateIssueType = { state: 'closed' };
       const update = await githubApi.updateIssue(
@@ -70,8 +53,8 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
       if (update) {
         await getIssues(accessToken as string);
         showMessage('success', 'Close issue successfully');
-        setUpdateIssueLoading(false);
-        setIsOpenModal(false);
+        closeModalConfirmLoading();
+        closeModal();
       }
     }
   };
@@ -83,7 +66,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
     try {
       const editIssue = await editForm.validateFields();
       fieldsRef.current = [editIssue];
-      setUpdateIssueLoading(true);
+      openModalConfirmLoading();
       const updateIssue = await githubApi.updateIssue(
         accessToken as string,
         editIssue,
@@ -92,53 +75,65 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
       if (updateIssue) {
         await getIssues(accessToken as string);
         showMessage('success', 'Update issue successfully');
-        setUpdateIssueLoading(false);
-        setIsOpenModal(false);
+        closeModalConfirmLoading();
+        closeModal();
       }
     } catch (err) {
       return;
     }
   };
 
-  const onOKHandler = () => {
-    if (editModalRef.current) {
-      updateEditIssue();
-    } else {
-      closeIssue();
-    }
-  };
-
-  const handleCancel = () => {
+  /**
+   * cancel handler
+   */
+  const cancelHandler = () => {
     fieldsRef.current = initialFormValues;
     editForm.resetFields();
-    setIsOpenModal(false);
+    closeModal();
+  };
+
+  /**
+   * show edit modal
+   */
+  const editIssueHandler = (): void => {
+    closeMoreAction();
+    const modalData: ModalType = {
+      isOpen: true,
+      okText: 'Edit',
+      cancelText: 'Cancel',
+      onOKHandler: updateEditIssue,
+      onCancelHandler: cancelHandler,
+      content: <EditForm fields={fieldsRef.current} editForm={editForm} />,
+    };
+    openModal(modalData);
+  };
+
+  /**
+   * show delete model
+   */
+  const deleteIssueHandler = (): void => {
+    closeMoreAction();
+    const modalData: ModalType = {
+      isOpen: true,
+      okText: 'Yes',
+      cancelText: 'No',
+      onOKHandler: closeIssue,
+      onCancelHandler: cancelHandler,
+      content: <div>Are you sure to close this issue?</div>,
+    };
+    openModal(modalData);
   };
 
   return (
     <div className={styled.container}>
-      <Button type="link" onClick={editHandler}>
+      <Button type="link" onClick={editIssueHandler}>
         <EditOutlined className={styled.icon} />
         Edit
       </Button>
-      <Button type="link" danger onClick={deleteHandler}>
+      <Button type="link" danger onClick={deleteIssueHandler}>
         <DeleteOutlined className={styled.icon} />
         Delete
       </Button>
-      <Modal
-        open={isOpenModal}
-        onOk={onOKHandler}
-        confirmLoading={updateIssueLoading}
-        onCancel={handleCancel}
-        okText={editModalRef.current ? 'Edit' : 'Yes'}
-        cancelText={editModalRef.current ? 'Cancel' : 'No'}
-        centered
-      >
-        {editModalRef.current ? (
-          <EditForm fields={fieldsRef.current} editForm={editForm} />
-        ) : (
-          <div>Are you sure to close this issue?</div>
-        )}
-      </Modal>
     </div>
   );
 };

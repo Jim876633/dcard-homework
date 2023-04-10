@@ -7,6 +7,10 @@ import {
   useState,
 } from 'react';
 
+const AccessTokenContext = createContext<AccessTokenValueType>(
+  {} as AccessTokenValueType
+);
+
 /**
  * useContext
  */
@@ -36,8 +40,3 @@ interface AccessTokenValueType {
 interface props {
   children: ReactNode;
 }
-
-const AccessTokenContext = createContext<AccessTokenValueType>({
-  accessToken: '',
-  setAccessToken: () => {},
-});

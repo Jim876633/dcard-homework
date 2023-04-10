@@ -3,21 +3,20 @@ import { CreateForm } from '@src/components/CreateForm';
 import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { useUIContext } from '@src/context/useUIContext';
+import { CreateIssueType } from '@src/models/IssueType';
+import { ModalType } from '@src/models/ModalType';
 import { githubApi } from '@src/services/github-api';
-import { Button, Divider, Form, Input, List, Modal, Skeleton } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { Button, Divider, Form, Input, List, Skeleton } from 'antd';
+import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { Issue } from '../components/Issue';
 import styled from './IssuesPage.module.scss';
-import { CreateIssueType } from '@src/models/IssueType';
 
 export const IssuesPage = () => {
   const { accessToken, setAccessToken } = useTokenContext();
   const { messageContext, showMessage } = useUIContext();
-  const [isOpenModal, setIsOpenModal] = useState(false);
   const [createForm] = Form.useForm();
-  const editModalRef = useRef<Boolean>(false);
   const {
     getIssues,
     issues,
@@ -29,7 +28,12 @@ export const IssuesPage = () => {
     hasMoreRef,
   } = useIssuesContext();
   const [isLoading, setIsLoading] = useState(false);
-  const [updateIssueLoading, setUpdateIssueLoading] = useState(false);
+  const {
+    openModal,
+    closeModal,
+    openModalConfirmLoading,
+    closeModalConfirmLoading,
+  } = useUIContext();
 
   const validRepos = [...new Set(issues.map(issue => issue.repository.name))];
 
@@ -86,7 +90,7 @@ export const IssuesPage = () => {
   const createIssue = async () => {
     try {
       const issue: CreateIssueType = await createForm.validateFields();
-      setUpdateIssueLoading(true);
+      openModalConfirmLoading();
 
       const createParams = {
         owner: user?.accountName as string,
@@ -101,24 +105,27 @@ export const IssuesPage = () => {
       if (createIssue) {
         await getIssues(accessToken as string);
         showMessage('success', 'Create an issue successfully');
-        setUpdateIssueLoading(false);
-        setIsOpenModal(false);
+        closeModalConfirmLoading();
+        closeModal();
       }
     } catch {
       return;
     }
   };
 
-  const openModal = () => {
-    setIsOpenModal(true);
-  };
-
-  const onOKHandler = () => {
-    createIssue();
-  };
-
-  const handleCancel = () => {
-    setIsOpenModal(false);
+  /**
+   * show create modal
+   */
+  const createIssueHandler = () => {
+    const modalData: ModalType = {
+      isOpen: true,
+      okText: 'Create',
+      cancelText: 'Cancel',
+      onOKHandler: createIssue,
+      onCancelHandler: closeModal,
+      content: <CreateForm createForm={createForm} repos={validRepos} />,
+    };
+    openModal(modalData);
   };
 
   useEffect(() => {
@@ -179,18 +186,7 @@ export const IssuesPage = () => {
           />
         </InfiniteScroll>
       </div>
-      <Modal
-        open={isOpenModal}
-        onOk={onOKHandler}
-        confirmLoading={updateIssueLoading}
-        onCancel={handleCancel}
-        okText={'Create'}
-        cancelText={'Cancel'}
-        centered
-      >
-        <CreateForm createForm={createForm} repos={validRepos} />
-      </Modal>
-      <Button onClick={openModal}>Creat issues</Button>
+      <Button onClick={createIssueHandler}>Creat issues</Button>
     </div>
   );
 };
