@@ -1,0 +1,15 @@
+@import '@styles/_variables.scss';
+.container {
+  height: max(48rem, 100%);
+  width: max(30rem, 100%);
+  .content {
+    display: flex;
+    flex-direction: column;
+    background-color: $primary-light-color;
+    padding: 2rem max(10%, 5rem);
+    &_inner {
+      background-color: white;
+      height: 100%;
+    }
+  }
+}

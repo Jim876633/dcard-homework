@@ -7,16 +7,33 @@ import { Avatar, Button, Card, List, Popover, Select } from 'antd';
 import { useState } from 'react';
 import styled from './Issue.module.scss';
 import { MoreAction } from './MoreAction';
+import { useNavigate } from 'react-router-dom';
 
 interface props {
   issue: GetIssueType;
 }
 
+const options = [
+  {
+    value: LabelEnum.OPEN,
+    label: LabelEnum.OPEN,
+  },
+  {
+    value: LabelEnum.IN_PROGRESS,
+    label: LabelEnum.IN_PROGRESS,
+  },
+  {
+    value: LabelEnum.DONE,
+    label: LabelEnum.DONE,
+  },
+];
+
 export const Issue = ({ issue }: props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openMoreAction, setOpenMoreAction] = useState(false);
   const { accessToken } = useTokenContext();
-  const { Meta } = Card;
+  const navigate = useNavigate();
+
   const updateParams = {
     owner: issue.user.accountName,
     repo: issue.repository.name,
@@ -35,6 +52,10 @@ export const Issue = ({ issue }: props) => {
         updateParams
       );
     }
+  };
+
+  const onClickHandler = () => {
+    navigate(`/issues/detail/${issue.id}`, { state: issue });
   };
   //TODO: add it
   // useEffect(() => {
@@ -65,20 +86,7 @@ export const Issue = ({ issue }: props) => {
         defaultValue={issue.labels[0]?.name || LabelEnum.OPEN}
         style={{ width: 150, textAlign: 'left', marginRight: '1rem' }}
         onChange={selectChangeHandler}
-        options={[
-          {
-            value: LabelEnum.OPEN,
-            label: LabelEnum.OPEN,
-          },
-          {
-            value: LabelEnum.IN_PROGRESS,
-            label: LabelEnum.IN_PROGRESS,
-          },
-          {
-            value: LabelEnum.DONE,
-            label: LabelEnum.DONE,
-          },
-        ]}
+        options={options}
       />
       <Popover
         placement="bottom"
