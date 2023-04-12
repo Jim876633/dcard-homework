@@ -14,13 +14,12 @@ import { Issue } from '../components/Issue';
 import styled from './IssuesPage.module.scss';
 
 export const IssuesPage = () => {
-  const { accessToken, setAccessToken } = useTokenContext();
+  const { accessToken } = useTokenContext();
   const { messageContext, showMessage } = useUIContext();
   const [createForm] = Form.useForm();
   const {
     getIssues,
     issues,
-    getUser,
     user,
     setIssues,
     getMoreIssues,
@@ -37,19 +36,7 @@ export const IssuesPage = () => {
 
   const validRepos = [...new Set(issues.map(issue => issue.repository.name))];
 
-  const navigate = useNavigate();
   let fetchTimeID: any;
-
-  /**
-   * get acess token
-   * @param code
-   */
-  const getAcessToken = async (code: string) => {
-    const accessToken = await githubApi.getAccessToken(code);
-    localStorage.setItem('access_token', accessToken);
-    setAccessToken(accessToken);
-    navigate('/issues');
-  };
 
   /**
    * search issues handler
@@ -79,8 +66,8 @@ export const IssuesPage = () => {
   const loadMoreIssues = async () => {
     pageRef.current += 1;
     if (accessToken) {
-      const moreIssues = await getMoreIssues(accessToken, pageRef.current);
-      if (moreIssues.length === 0) hasMoreRef.current = false;
+      const moreIssues = await getMoreIssues(pageRef.current);
+      if (moreIssues?.length === 0) hasMoreRef.current = false;
     }
   };
 
@@ -103,7 +90,7 @@ export const IssuesPage = () => {
         createParams
       );
       if (createIssue) {
-        await getIssues(accessToken as string);
+        await getIssues();
         showMessage('success', 'Create an issue successfully');
         closeModalConfirmLoading();
         closeModal();
@@ -127,29 +114,6 @@ export const IssuesPage = () => {
     };
     openModal(modalData);
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-    const localStorageToken = localStorage.getItem('access_token');
-    if (!localStorageToken) {
-      const query = window.location.search;
-      const params = new URLSearchParams(query);
-      const queryUrl = params.get('code');
-      if (queryUrl) {
-        getAcessToken(queryUrl as string);
-      }
-    } else {
-      setAccessToken(localStorageToken);
-    }
-    if (accessToken) {
-      const fetchData = async () => {
-        await getUser(accessToken);
-        await getIssues(accessToken);
-        setIsLoading(false);
-      };
-      fetchData();
-    }
-  }, [accessToken]);
 
   return (
     <div className={styled.container}>

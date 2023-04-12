@@ -1,4 +1,5 @@
-import { Form, FormInstance, Input, Select } from 'antd';
+import { Form, FormInstance, Input, Select, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 interface props {
   createForm: FormInstance;
@@ -15,15 +16,13 @@ export const CreateForm = ({ createForm, repos }: props) => {
     return { value: repo, label: repo };
   });
 
-  const selectChangeHandler = () => {};
-
   return (
     <Form layout="vertical" fields={fields} form={createForm}>
       <Form.Item label="Repo" name="repo">
         <Select
           style={{ width: 150, textAlign: 'left', marginRight: '1rem' }}
-          onChange={selectChangeHandler}
           options={options}
+          notFoundContent={<Spin indicator={<LoadingOutlined />} />}
         />
       </Form.Item>
       <Form.Item

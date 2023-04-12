@@ -2,6 +2,7 @@ import { GetIssueType } from '@src/models/IssueType';
 import { UserType } from '@src/models/UserType';
 import { githubApi } from '@src/services/github-api';
 import { createContext, ReactNode, useContext, useRef, useState } from 'react';
+import { useTokenContext } from './useTokenContext';
 
 const IssuesContext = createContext<IssuesContextValue>(
   {} as IssuesContextValue
@@ -14,6 +15,7 @@ export const useIssuesContext = () => {
 export const IssuesContextProvier = ({ children }: Props) => {
   const [issues, setIssues] = useState<GetIssueType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
+  const { accessToken } = useTokenContext();
   const pageRef = useRef(1);
   const hasMoreRef = useRef(true);
 
@@ -27,36 +29,47 @@ export const IssuesContextProvier = ({ children }: Props) => {
 
   /**
    * get user data
-   * @param accessToken
    */
-  const getUser = async (accessToken: string) => {
-    const user = await githubApi.getUser(accessToken);
-    resetIssuesLoad();
-    setUser(user);
-    return user;
+  const getUser = async () => {
+    if (accessToken) {
+      const user = await githubApi.getUser(accessToken);
+      resetIssuesLoad();
+      setUser(user);
+      return user;
+    }
   };
 
   /**
    * get user issues
-   * @param token
    * @param page
    */
-  const getIssues = async (accessToken: string, page: number = 1) => {
-    const data = await githubApi.getUserIssues(accessToken, page);
-    resetIssuesLoad();
-    setIssues(data);
-    return data;
+  const getIssues = async (page: number = 1) => {
+    if (accessToken) {
+      const data = await githubApi.getUserIssues(accessToken, page);
+      resetIssuesLoad();
+      setIssues(data);
+      return data;
+    }
   };
 
   /**
    * get more issues
-   * @param accessToken
    * @param page
    */
-  const getMoreIssues = async (accessToken: string, page: number) => {
-    const data = await githubApi.getUserIssues(accessToken, page);
-    setIssues(prev => [...prev, ...data]);
-    return data;
+  const getMoreIssues = async (page: number) => {
+    if (accessToken) {
+      const data = await githubApi.getUserIssues(accessToken, page);
+      setIssues(prev => [...prev, ...data]);
+      return data;
+    }
+  };
+
+  //TODO: create issue repolist
+  const getUserRepos = async (user: string) => {
+    if (accessToken) {
+      const data = await githubApi.searchIssues(accessToken, '', { user });
+      return data.map(issue => issue.repository_url);
+    }
   };
 
   const value = {
@@ -84,9 +97,9 @@ interface Props {
 interface IssuesContextValue {
   user: UserType | null;
   issues: GetIssueType[];
-  getIssues: (taoken: string, page?: number) => Promise<GetIssueType[]>;
-  getMoreIssues: (taoken: string, page: number) => Promise<GetIssueType[]>;
-  getUser: (token: string) => Promise<UserType>;
+  getIssues: (page?: number) => Promise<GetIssueType[] | undefined>;
+  getMoreIssues: (page: number) => Promise<GetIssueType[] | undefined>;
+  getUser: () => Promise<UserType | undefined>;
   setIssues: React.Dispatch<React.SetStateAction<GetIssueType[]>>;
   pageRef: React.MutableRefObject<number>;
   hasMoreRef: React.MutableRefObject<boolean>;

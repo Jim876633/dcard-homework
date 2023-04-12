@@ -1,3 +1,4 @@
+import { githubApi } from '@src/services/github-api';
 import {
   createContext,
   Dispatch,
@@ -6,6 +7,7 @@ import {
   useContext,
   useState,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AccessTokenContext = createContext<AccessTokenValueType>(
   {} as AccessTokenValueType
@@ -23,8 +25,24 @@ export const useTokenContext = () => {
  */
 export const AccessTokenContextProvider = ({ children }: props) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  /**
+   * get acess token
+   * @param code
+   */
+  const getAccessToken = async (code: string) => {
+    const accessToken = await githubApi.getAccessToken(code);
+    localStorage.setItem('access_token', accessToken);
+    setAccessToken(accessToken);
+    navigate('/issues');
+  };
+
   return (
-    <AccessTokenContext.Provider value={{ accessToken, setAccessToken }}>
+    <AccessTokenContext.Provider
+      value={{ accessToken, setAccessToken, getAccessToken }}
+    >
       {children}
     </AccessTokenContext.Provider>
   );
@@ -36,6 +54,7 @@ export const AccessTokenContextProvider = ({ children }: props) => {
 interface AccessTokenValueType {
   accessToken: string | null;
   setAccessToken: Dispatch<SetStateAction<string | null>>;
+  getAccessToken: (code: string) => Promise<void>;
 }
 interface props {
   children: ReactNode;

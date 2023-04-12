@@ -51,7 +51,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
         updateParams
       );
       if (update) {
-        await getIssues(accessToken as string);
+        await getIssues();
         showMessage('success', 'Close issue successfully');
         closeModalConfirmLoading();
         closeModal();
@@ -73,7 +73,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
         updateParams
       );
       if (updateIssue) {
-        await getIssues(accessToken as string);
+        await getIssues();
         showMessage('success', 'Update issue successfully');
         closeModalConfirmLoading();
         closeModal();
