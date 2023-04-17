@@ -21,6 +21,11 @@ export const formatUser = (user: any): UserType | UserType[] => {
 };
 
 export const formatRepo = (repo: any): RepoType => {
+  if (repo instanceof String) {
+    return {
+      name: repo.split('/').slice(-1).join(''),
+    };
+  }
   return {
     id: repo.id,
     name: repo.name,
@@ -34,7 +39,9 @@ export const formatIssue = (issue: any): GetIssueType => {
     issue.assignees
   ) as UserType[];
   const formattedUser: UserType = formatUser(issue.user) as UserType;
-  const formattedRepo: RepoType = formatRepo(issue.repository);
+  const formattedRepo: RepoType = formatRepo(
+    issue.repository || issue.repository_url
+  );
   return {
     id: issue.id,
     number: issue.number,

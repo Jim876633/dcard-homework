@@ -6,10 +6,18 @@ import { useUIContext } from '@src/context/useUIContext';
 import { CreateIssueType } from '@src/models/IssueType';
 import { ModalType } from '@src/models/ModalType';
 import { githubApi } from '@src/services/github-api';
-import { Button, Divider, Form, Input, List, Skeleton } from 'antd';
+import {
+  Button,
+  Divider,
+  Empty,
+  Form,
+  Input,
+  List,
+  Skeleton,
+  Spin,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useNavigate } from 'react-router-dom';
 import { Issue } from '../components/Issue';
 import styled from './IssuesPage.module.scss';
 
@@ -17,16 +25,19 @@ export const IssuesPage = () => {
   const { accessToken } = useTokenContext();
   const { messageContext, showMessage } = useUIContext();
   const [createForm] = Form.useForm();
+  const [isListEmpty, setIsListEmpty] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [repos, setRepos] = useState<string[]>([]);
   const {
     getIssues,
     issues,
     user,
-    setIssues,
+    searchIssues,
     getMoreIssues,
+    getUserRepos,
     pageRef,
     hasMoreRef,
   } = useIssuesContext();
-  const [isLoading, setIsLoading] = useState(false);
   const {
     openModal,
     closeModal,
@@ -34,30 +45,29 @@ export const IssuesPage = () => {
     closeModalConfirmLoading,
   } = useUIContext();
 
-  const validRepos = [...new Set(issues.map(issue => issue.repository.name))];
-
   let fetchTimeID: any;
 
   /**
    * search issues handler
    */
+  //TODO: 優化搜尋
   const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsLoading(true);
+    setIsListEmpty(false);
     clearTimeout(fetchTimeID);
     fetchTimeID = setTimeout(() => {
       const fetchSearchIssue = async () => {
         const query = e.target.value;
-        const searchParams = { user: user?.accountName as string };
-        const searchIssues = await githubApi.searchIssues(
-          accessToken as string,
-          query,
-          searchParams
-        );
-        setIssues(searchIssues);
-        setIsLoading(false);
+        const issues = await searchIssues(query);
+        if (issues) {
+          if (issues.length === 0) {
+            setIsListEmpty(true);
+          }
+          setIsLoading(false);
+        }
       };
       fetchSearchIssue();
-    }, 300);
+    }, 500);
   };
 
   /**
@@ -110,10 +120,24 @@ export const IssuesPage = () => {
       cancelText: 'Cancel',
       onOKHandler: createIssue,
       onCancelHandler: closeModal,
-      content: <CreateForm createForm={createForm} repos={validRepos} />,
+      content: <CreateForm createForm={createForm} repos={repos} />,
     };
     openModal(modalData);
   };
+
+  const initSetting = async () => {
+    const userRepos = await getUserRepos();
+    if (userRepos) {
+      setRepos(userRepos);
+    }
+  };
+
+  useEffect(() => {
+    if (issues.length > 0) {
+      setIsLoading(false);
+      initSetting();
+    }
+  }, [issues]);
 
   return (
     <div className={styled.container}>
@@ -124,33 +148,45 @@ export const IssuesPage = () => {
         onChange={onChangeHandler}
       />
       {messageContext}
-      <div className={styled.issues} id="scrollableDiv">
-        <InfiniteScroll
-          dataLength={issues.length}
-          next={loadMoreIssues}
-          hasMore={hasMoreRef.current}
-          loader={
-            <Skeleton
-              avatar={{ size: 'default' }}
-              paragraph={{ rows: 2 }}
-              title={false}
-              style={{ padding: '1rem 1.5rem' }}
-              active
+      <Spin spinning={isLoading}>
+        <div className={styled.issues} id="scrollableDiv">
+          <InfiniteScroll
+            dataLength={issues.length}
+            next={loadMoreIssues}
+            hasMore={hasMoreRef.current || issues.length === 0}
+            loader={
+              issues.length !== 0 && (
+                <Skeleton
+                  avatar={{ size: 'default' }}
+                  paragraph={{ rows: 2 }}
+                  title={false}
+                  style={{ padding: '1rem 1.5rem' }}
+                  active
+                />
+              )
+            }
+            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            scrollableTarget="scrollableDiv"
+          >
+            <List
+              locale={{
+                emptyText: isListEmpty ? (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                ) : (
+                  <div></div>
+                ),
+              }}
+              size="large"
+              itemLayout="horizontal"
+              dataSource={issues}
+              renderItem={issue => <Issue key={issue.id} issue={issue} />}
             />
-          }
-          endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-          scrollableTarget="scrollableDiv"
-        >
-          <List
-            loading={isLoading}
-            size="large"
-            itemLayout="horizontal"
-            dataSource={issues}
-            renderItem={issue => <Issue key={issue.id} issue={issue} />}
-          />
-        </InfiniteScroll>
-      </div>
-      <Button onClick={createIssueHandler}>Creat issues</Button>
+          </InfiniteScroll>
+        </div>
+      </Spin>
+      <Button onClick={createIssueHandler} disabled={isLoading}>
+        Creat issues
+      </Button>
     </div>
   );
 };

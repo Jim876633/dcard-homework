@@ -1,9 +1,7 @@
-import { Button } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
-import styled from './LoginPage.module.scss';
-import { useEffect } from 'react';
-import { useTokenContext } from '@src/context/useTokenContext';
+import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import styled from './LoginPage.module.scss';
 
 const client_id = 'bfca6242ab51f259a7e6';
 

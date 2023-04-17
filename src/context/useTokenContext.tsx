@@ -36,7 +36,7 @@ export const AccessTokenContextProvider = ({ children }: props) => {
     const accessToken = await githubApi.getAccessToken(code);
     localStorage.setItem('access_token', accessToken);
     setAccessToken(accessToken);
-    navigate('/issues');
+    return accessToken;
   };
 
   return (
@@ -54,7 +54,7 @@ export const AccessTokenContextProvider = ({ children }: props) => {
 interface AccessTokenValueType {
   accessToken: string | null;
   setAccessToken: Dispatch<SetStateAction<string | null>>;
-  getAccessToken: (code: string) => Promise<void>;
+  getAccessToken: (code: string) => Promise<string>;
 }
 interface props {
   children: ReactNode;
