@@ -65,7 +65,6 @@ export const IssuesContextProvier = ({ children }: Props) => {
     }
   };
 
-  //TODO: create issue repolist
   const getUserRepos = async () => {
     if (accessToken && user) {
       const data = await githubApi.searchIssues(accessToken, '', {

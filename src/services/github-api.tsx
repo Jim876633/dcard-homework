@@ -1,11 +1,15 @@
 import {
   GetIssueType,
-  RepoType,
   UpdateIssueType,
   UpdateLabelsType,
 } from '@src/models/IssueType';
+import {
+  CreateParamsType,
+  SearchParamsType,
+  UpdateParamsType,
+} from '@src/models/ParamsType';
 import { UserType } from '@src/models/UserType';
-import { formatIssue, formatRepo, formatUser } from '@src/utils/format-data';
+import { formatIssue, formatUser } from '@src/utils/format-data';
 
 /**
  * get access token
@@ -195,16 +199,3 @@ export const githubApi = {
   searchIssues,
   createIssue,
 };
-
-interface SearchParamsType {
-  user: string;
-  repo?: string;
-}
-
-interface CreateParamsType {
-  owner: string;
-  repo: string;
-}
-interface UpdateParamsType extends CreateParamsType {
-  issueNumber: number;
-}
