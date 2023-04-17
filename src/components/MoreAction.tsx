@@ -20,7 +20,6 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
     { name: 'title', value: issue.title },
     { name: 'body', value: issue.body },
   ];
-  const { accessToken } = useTokenContext();
   const {
     showMessage,
     closeModal,
@@ -28,7 +27,7 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
     openModalConfirmLoading,
     closeModalConfirmLoading,
   } = useUIContext();
-  const { getIssues } = useIssuesContext();
+  const { getIssues, updateIssue } = useIssuesContext();
   const [editForm] = Form.useForm();
   const fieldsRef = useRef(initialFormValues);
 
@@ -43,19 +42,13 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
    */
   const closeIssue = async () => {
     openModalConfirmLoading();
-    if (accessToken) {
-      const updateIssue: UpdateIssueType = { state: 'closed' };
-      const update = await githubApi.updateIssue(
-        accessToken,
-        updateIssue,
-        updateParams
-      );
-      if (update) {
-        await getIssues();
-        showMessage('success', 'Close issue successfully');
-        closeModalConfirmLoading();
-        closeModal();
-      }
+    const issue: UpdateIssueType = { state: 'closed' };
+    const update = await updateIssue(issue, updateParams);
+    if (update) {
+      await getIssues();
+      showMessage('success', 'Close issue successfully');
+      closeModalConfirmLoading();
+      closeModal();
     }
   };
 
@@ -67,12 +60,8 @@ export const MoreAction = ({ issue, closeMoreAction }: props) => {
       const editIssue = await editForm.validateFields();
       fieldsRef.current = [editIssue];
       openModalConfirmLoading();
-      const updateIssue = await githubApi.updateIssue(
-        accessToken as string,
-        editIssue,
-        updateParams
-      );
-      if (updateIssue) {
+      const issue = await updateIssue(editIssue, updateParams);
+      if (issue) {
         await getIssues();
         showMessage('success', 'Update issue successfully');
         closeModalConfirmLoading();

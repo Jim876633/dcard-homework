@@ -1,5 +1,5 @@
-import { Form, FormInstance, Input, Select, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { Form, FormInstance, Input, Select, Spin } from 'antd';
 
 interface props {
   createForm: FormInstance;

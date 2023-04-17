@@ -1,8 +1,9 @@
-import { GetIssueType } from '@src/models/IssueType';
+import { GetIssueType, UpdateIssueType } from '@src/models/IssueType';
 import { UserType } from '@src/models/UserType';
 import { githubApi } from '@src/services/github-api';
 import { createContext, ReactNode, useContext, useRef, useState } from 'react';
 import { useTokenContext } from './useTokenContext';
+import { UpdateParamsType } from '@src/models/ParamsType';
 
 const IssuesContext = createContext<IssuesContextValue>(
   {} as IssuesContextValue
@@ -65,10 +66,52 @@ export const IssuesContextProvier = ({ children }: Props) => {
   };
 
   //TODO: create issue repolist
-  const getUserRepos = async (user: string) => {
+  const getUserRepos = async () => {
+    if (accessToken && user) {
+      const data = await githubApi.searchIssues(accessToken, '', {
+        user: user.accountName,
+      });
+      return [...new Set(data.map(issue => issue.repository.name))];
+    }
+  };
+
+  /**
+   * search issues
+   * @param query
+   * @returns issues or undefined
+   */
+  const searchIssues = async (query: string) => {
+    if (user && accessToken) {
+      const issues = await githubApi.searchIssues(
+        accessToken as string,
+        query,
+        { user: user.accountName }
+      );
+      setIssues(issues);
+      return issues;
+    }
+  };
+
+  /**
+   *
+   * @param issue
+   * @param updateParams
+   * @returns update issue or undefined
+   */
+  const updateIssue = async (
+    issue: UpdateIssueType,
+    updateParams: UpdateParamsType
+  ) => {
     if (accessToken) {
-      const data = await githubApi.searchIssues(accessToken, '', { user });
-      return data.map(issue => issue.repository_url);
+      const update = await githubApi.updateIssue(
+        accessToken,
+        issue,
+        updateParams
+      );
+      if (update.id) {
+        getIssues();
+      }
+      return update;
     }
   };
 
@@ -78,7 +121,9 @@ export const IssuesContextProvier = ({ children }: Props) => {
     getIssues,
     getMoreIssues,
     getUser,
-    setIssues,
+    searchIssues,
+    updateIssue,
+    getUserRepos,
     pageRef,
     hasMoreRef,
   };
@@ -100,7 +145,12 @@ interface IssuesContextValue {
   getIssues: (page?: number) => Promise<GetIssueType[] | undefined>;
   getMoreIssues: (page: number) => Promise<GetIssueType[] | undefined>;
   getUser: () => Promise<UserType | undefined>;
-  setIssues: React.Dispatch<React.SetStateAction<GetIssueType[]>>;
+  searchIssues: (query: string) => Promise<GetIssueType[] | undefined>;
+  updateIssue: (
+    issue: UpdateIssueType,
+    updateParams: UpdateParamsType
+  ) => Promise<GetIssueType | undefined>;
+  getUserRepos: () => Promise<string[] | undefined>;
   pageRef: React.MutableRefObject<number>;
   hasMoreRef: React.MutableRefObject<boolean>;
 }

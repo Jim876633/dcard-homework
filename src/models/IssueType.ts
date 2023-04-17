@@ -14,7 +14,6 @@ export interface GetIssueType extends UpdateIssueType {
   updated_at: string;
   closed_at: string | null;
   repository: RepoType;
-  repository_url?: string;
   user: UserType;
   labels: GetLabelType[];
 }
