@@ -1,0 +1,11 @@
+@import '@styles/_variables.scss';
+.spin_block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-content: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: $opacity-color;
+}

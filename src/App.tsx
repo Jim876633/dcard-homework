@@ -5,7 +5,6 @@ import { LoginPage } from './pages/LoginPage';
 import { LayoutElement } from './components/Layout/Layout';
 import { ProtectRoutes } from './components/Routes/ProtectRoutes';
 
-//TODO: test protect routes
 function App() {
   return (
     <Routes>

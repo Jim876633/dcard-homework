@@ -2,9 +2,11 @@ import { useIssuesContext } from '@src/context/useIssuesContext';
 import { useTokenContext } from '@src/context/useTokenContext';
 import { Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import styled from './ProtectRoutes.module.scss';
 
 export const ProtectRoutes = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const { accessToken, setAccessToken, getAccessToken } = useTokenContext();
@@ -22,24 +24,27 @@ export const ProtectRoutes = () => {
       const queryUrl = params.get('code');
       if (queryUrl) {
         getAccessToken(queryUrl);
+        navigate('/issues');
+      } else {
+        setLoading(false);
       }
     }
-    //TODO: test is accessToken get in asyn function
-    console.log(accessToken);
-    if (accessToken) {
-      const fetchData = async () => {
-        await getUser();
-        await getIssues();
+    const fetchData = async () => {
+      const user = await getUser();
+      if (user) {
+        getIssues();
         setLoading(false);
-      };
-      fetchData();
-    }
-    //TODO: if accessToken first time is undefined can't use loading false it will return to homepage
-    // setLoading(false)
+      }
+    };
+    fetchData();
   }, [accessToken]);
 
   if (loading) {
-    return <Spin />;
+    return (
+      <div className={styled.spin_block}>
+        <Spin size="large" />
+      </div>
+    );
   }
   if (user?.id) {
     return <Outlet />;
