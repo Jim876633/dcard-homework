@@ -1,4 +1,3 @@
-import { LabelEnum } from '@src/enums/labelEnum';
 import { UpdateLabelsType } from '@src/models/IssueType';
 
 // export const labels = {
@@ -19,4 +18,4 @@ import { UpdateLabelsType } from '@src/models/IssueType';
 //   },
 // };
 
-export const labelData = ['open', 'in progress', 'done'];
+export const labelData = ['all', 'open', 'in progress', 'done'];

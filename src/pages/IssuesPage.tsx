@@ -30,7 +30,7 @@ export const IssuesPage = () => {
   const [repos, setRepos] = useState<string[]>([]);
   const {
     getIssues,
-    issues,
+    tabIssues,
     user,
     searchIssues,
     getMoreIssues,
@@ -133,11 +133,27 @@ export const IssuesPage = () => {
   };
 
   useEffect(() => {
-    if (issues.length > 0) {
+    if (tabIssues.length > 0) {
       setIsLoading(false);
       initSetting();
     }
-  }, [issues]);
+    const scrollableDiv = document.getElementById('scrollableDiv');
+    if (
+      hasMoreRef.current &&
+      tabIssues.length !== 0 &&
+      scrollableDiv &&
+      scrollableDiv.scrollHeight <= scrollableDiv.clientHeight
+    ) {
+      console.log('hi');
+      loadMoreIssues();
+    }
+    //TODO: move isEmpty to context
+    if (tabIssues.length === 0) {
+      setIsListEmpty(true);
+    } else {
+      setIsListEmpty(false);
+    }
+  }, [tabIssues]);
 
   return (
     <div className={styled.container}>
@@ -151,11 +167,11 @@ export const IssuesPage = () => {
       <Spin spinning={isLoading}>
         <div className={styled.issues} id="scrollableDiv">
           <InfiniteScroll
-            dataLength={issues.length}
+            dataLength={tabIssues.length}
             next={loadMoreIssues}
-            hasMore={hasMoreRef.current || issues.length === 0}
+            hasMore={hasMoreRef.current || tabIssues.length === 0}
             loader={
-              issues.length !== 0 && (
+              tabIssues.length !== 0 && (
                 <Skeleton
                   avatar={{ size: 'default' }}
                   paragraph={{ rows: 2 }}
@@ -178,7 +194,7 @@ export const IssuesPage = () => {
               }}
               size="large"
               itemLayout="horizontal"
-              dataSource={issues}
+              dataSource={tabIssues}
               renderItem={issue => <Issue key={issue.id} issue={issue} />}
             />
           </InfiniteScroll>

@@ -1,6 +1,5 @@
 import { MoreOutlined } from '@ant-design/icons';
 import { useTokenContext } from '@src/context/useTokenContext';
-import { LabelEnum } from '@src/enums/labelEnum';
 import { GetIssueType, LabelName } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
 import { Avatar, Button, Card, List, Popover, Select } from 'antd';
@@ -8,6 +7,7 @@ import { useState } from 'react';
 import styled from './Issue.module.scss';
 import { MoreAction } from './MoreAction';
 import { useNavigate } from 'react-router-dom';
+import { LabelOptionEnum } from '@src/enums/labelEnum';
 
 interface props {
   issue: GetIssueType;
@@ -15,16 +15,16 @@ interface props {
 
 const options = [
   {
-    value: LabelEnum.OPEN,
-    label: LabelEnum.OPEN,
+    value: LabelOptionEnum.OPEN,
+    label: LabelOptionEnum.OPEN,
   },
   {
-    value: LabelEnum.IN_PROGRESS,
-    label: LabelEnum.IN_PROGRESS,
+    value: LabelOptionEnum.IN_PROGRESS,
+    label: LabelOptionEnum.IN_PROGRESS,
   },
   {
-    value: LabelEnum.DONE,
-    label: LabelEnum.DONE,
+    value: LabelOptionEnum.DONE,
+    label: LabelOptionEnum.DONE,
   },
 ];
 
@@ -83,7 +83,7 @@ export const Issue = ({ issue }: props) => {
         description={issue.body}
       />
       <Select
-        defaultValue={issue.labels[0]?.name || LabelEnum.OPEN}
+        defaultValue={issue.labels[0]?.name || LabelOptionEnum.OPEN}
         style={{ width: 150, textAlign: 'left', marginRight: '1rem' }}
         onChange={selectChangeHandler}
         options={options}

@@ -4,6 +4,7 @@ import { githubApi } from '@src/services/github-api';
 import { createContext, ReactNode, useContext, useRef, useState } from 'react';
 import { useTokenContext } from './useTokenContext';
 import { UpdateParamsType } from '@src/models/ParamsType';
+import { LabelOptionEnum } from '@src/enums/labelEnum';
 
 const IssuesContext = createContext<IssuesContextValue>(
   {} as IssuesContextValue
@@ -16,6 +17,7 @@ export const useIssuesContext = () => {
 export const IssuesContextProvier = ({ children }: Props) => {
   const [issues, setIssues] = useState<GetIssueType[]>([]);
   const [user, setUser] = useState<UserType | null>(null);
+  const [tab, setTab] = useState<string>(LabelOptionEnum.ALL);
   const { accessToken } = useTokenContext();
   const pageRef = useRef(1);
   const hasMoreRef = useRef(true);
@@ -114,8 +116,20 @@ export const IssuesContextProvier = ({ children }: Props) => {
     }
   };
 
+  //TODO: select tab
+  const selectTab = (tab: string) => {
+    setTab(tab);
+  };
+
+  const tabIssues =
+    tab === LabelOptionEnum.ALL
+      ? issues
+      : issues.filter(issue => {
+          console.log(tab);
+          return issue.labels.some(label => label.name === tab);
+        });
+
   const value = {
-    issues,
     user,
     getIssues,
     getMoreIssues,
@@ -123,6 +137,8 @@ export const IssuesContextProvier = ({ children }: Props) => {
     searchIssues,
     updateIssue,
     getUserRepos,
+    selectTab,
+    tabIssues,
     pageRef,
     hasMoreRef,
   };
@@ -140,7 +156,6 @@ interface Props {
 
 interface IssuesContextValue {
   user: UserType | null;
-  issues: GetIssueType[];
   getIssues: (page?: number) => Promise<GetIssueType[] | undefined>;
   getMoreIssues: (page: number) => Promise<GetIssueType[] | undefined>;
   getUser: () => Promise<UserType | undefined>;
@@ -150,6 +165,8 @@ interface IssuesContextValue {
     updateParams: UpdateParamsType
   ) => Promise<GetIssueType | undefined>;
   getUserRepos: () => Promise<string[] | undefined>;
+  selectTab: (tab: string) => void;
+  tabIssues: GetIssueType[];
   pageRef: React.MutableRefObject<number>;
   hasMoreRef: React.MutableRefObject<boolean>;
 }
