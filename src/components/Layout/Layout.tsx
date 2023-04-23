@@ -1,12 +1,13 @@
-import { useUIContext } from '@src/context/useUIContext';
-import { Breadcrumb, Menu, Modal } from 'antd';
-import Layout, { Content, Footer, Header } from 'antd/es/layout/layout';
-import { Outlet } from 'react-router-dom';
-import styled from './Layout.module.scss';
 import { labelData } from '@src/constants/labels';
-import { MenuInfo } from 'rc-menu/lib/interface';
-import { LabelOptionEnum, LabelTabEnum } from '@src/enums/labelEnum';
 import { useIssuesContext } from '@src/context/useIssuesContext';
+import { useUIContext } from '@src/context/useUIContext';
+import { LabelOptionEnum, LabelTabEnum } from '@src/enums/labelEnum';
+import { Menu, Modal } from 'antd';
+import Layout, { Content, Footer, Header } from 'antd/es/layout/layout';
+import { MenuInfo } from 'rc-menu/lib/interface';
+import { Outlet } from 'react-router-dom';
+import { Breadcrumb } from './Breadcrumb';
+import styled from './Layout.module.scss';
 
 export const LayoutElement = () => {
   const { modalData } = useUIContext();
@@ -29,7 +30,7 @@ export const LayoutElement = () => {
         break;
     }
   };
-  //TODO: breadcrumbs
+
   return (
     <>
       <Layout className={styled.container}>
@@ -49,11 +50,7 @@ export const LayoutElement = () => {
           />
         </Header>
         <Content className={styled.content}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            <Breadcrumb.Item>App</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb />
           <div className={styled.content_inner}>
             <Outlet />
           </div>

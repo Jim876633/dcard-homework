@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Issue } from '../components/Issue';
 import styled from './IssuesPage.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 export const IssuesPage = () => {
   const { accessToken } = useTokenContext();
@@ -28,6 +29,7 @@ export const IssuesPage = () => {
   const [isListEmpty, setIsListEmpty] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [repos, setRepos] = useState<string[]>([]);
+
   const {
     getIssues,
     tabIssues,
@@ -125,6 +127,9 @@ export const IssuesPage = () => {
     openModal(modalData);
   };
 
+  /**
+   * init setting
+   */
   const initSetting = async () => {
     const userRepos = await getUserRepos();
     if (userRepos) {

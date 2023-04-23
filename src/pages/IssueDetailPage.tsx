@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 export const IssueDetailPage = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const issueDetail = location.state;
-  console.log(issueDetail);
-  useEffect(() => {
-    if (!issueDetail) {
-      navigate('/issues');
-    }
-  }, [issueDetail]);
+  const issueDetail: { id: string } | null = location.state;
+
+  if (!issueDetail?.id) {
+    return <Navigate to="/issues" />;
+  }
 
   return <div>IssueDetailPage {issueDetail.id}</div>;
 };

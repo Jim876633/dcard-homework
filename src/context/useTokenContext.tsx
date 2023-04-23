@@ -26,8 +26,6 @@ export const useTokenContext = () => {
 export const AccessTokenContextProvider = ({ children }: props) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const navigate = useNavigate();
-
   /**
    * get acess token
    * @param code

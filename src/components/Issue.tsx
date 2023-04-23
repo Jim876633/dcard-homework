@@ -1,13 +1,13 @@
 import { MoreOutlined } from '@ant-design/icons';
 import { useTokenContext } from '@src/context/useTokenContext';
+import { LabelOptionEnum } from '@src/enums/labelEnum';
 import { GetIssueType, LabelName } from '@src/models/IssueType';
 import { githubApi } from '@src/services/github-api';
-import { Avatar, Button, Card, List, Popover, Select } from 'antd';
+import { Avatar, Button, List, Popover, Select } from 'antd';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from './Issue.module.scss';
 import { MoreAction } from './MoreAction';
-import { useNavigate } from 'react-router-dom';
-import { LabelOptionEnum } from '@src/enums/labelEnum';
 
 interface props {
   issue: GetIssueType;
@@ -79,7 +79,11 @@ export const Issue = ({ issue }: props) => {
         avatar={
           <Avatar src={issue.user.avatarUrl} alt={issue.user.accountName} />
         }
-        title={issue.title}
+        title={
+          <Link to={`/issues/detail/${issue.id}`} state={{ id: issue.id }}>
+            {issue.title}
+          </Link>
+        }
         description={issue.body}
       />
       <Select

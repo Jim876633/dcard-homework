@@ -1,0 +1,16 @@
+@import '@styles/_variables.scss';
+.breadcrumbs {
+  display: flex;
+  margin: 0.5rem 0;
+}
+.breadcrumbItem {
+  list-style: none;
+  a {
+    color: $primary-color;
+  }
+  &:not(:last-child)::after {
+    content: '/';
+    color: $primary-color;
+    margin: 0 0.5rem;
+  }
+}
