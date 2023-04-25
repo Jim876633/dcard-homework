@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 import { LayoutElement } from '../Layout/Layout';
 import { ProtectRoutes } from './ProtectRoutes';
+import { ErrorPage } from '@src/pages/ErrorPage';
 
 export const Routers = () => {
   const router = createBrowserRouter(
@@ -38,6 +39,7 @@ export const Routers = () => {
             />
           </Route>
         </Route>
+        <Route path="*" element={<ErrorPage />} />
       </Route>
     )
   );

@@ -13,9 +13,7 @@ const defaultModalData = {
   isOpen: false,
   isConfirmLoading: false,
   onOKHandler: () => {},
-  onCancelHandler: () => {},
   okText: '',
-  cancelText: '',
   content: <div></div>,
 };
 

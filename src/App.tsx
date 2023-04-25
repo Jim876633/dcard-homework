@@ -1,13 +1,28 @@
-import { Link, Route, Routes } from 'react-router-dom';
-import { IssueDetailPage } from './pages/IssueDetailPage';
-import { IssuesPage } from './pages/IssuesPage';
-import { LoginPage } from './pages/LoginPage';
-import { LayoutElement } from './components/Layout/Layout';
-import { ProtectRoutes } from './components/Routes/ProtectRoutes';
+import Modal from 'antd/es/modal/Modal';
 import { Routers } from './components/Routes/Routers';
+import { useUIContext } from './context/useUIContext';
 
 function App() {
-  return <Routers />;
+  const { modalData } = useUIContext();
+  return (
+    <>
+      <Routers />
+      <Modal
+        open={modalData.isOpen}
+        onOk={modalData.onOKHandler}
+        confirmLoading={modalData.isConfirmLoading}
+        onCancel={modalData.onCancelHandler}
+        okText={modalData.okText}
+        cancelText={modalData.cancelText}
+        cancelButtonProps={{
+          style: { display: !modalData.cancelText ? 'none' : '' },
+        }}
+        centered
+      >
+        {modalData.content}
+      </Modal>
+    </>
+  );
 }
 
 export default App;

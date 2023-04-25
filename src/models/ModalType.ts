@@ -4,8 +4,8 @@ export type ModalType = {
   isOpen: boolean;
   isConfirmLoading?: boolean;
   onOKHandler: () => void;
-  onCancelHandler: () => void;
+  onCancelHandler?: () => void;
   okText: string;
-  cancelText: string;
+  cancelText?: string;
   content: ReactElement;
 };
