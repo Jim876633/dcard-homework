@@ -8,6 +8,7 @@
     "start:dev": "node --watch local-server.js & vite",
     "start:prod": "vite --config vite.config.prod.ts",
     "build": "tsc && vite build",
+    "build:prod": "tsc && vite build --config vite.config.prod.ts",
     "preview": "vite preview",
     "server": "node --watch local-server.js"
   },
