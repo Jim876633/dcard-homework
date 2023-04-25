@@ -125,7 +125,6 @@ export const IssuesContextProvier = ({ children }: Props) => {
     tab === LabelOptionEnum.ALL
       ? issues
       : issues.filter(issue => {
-          console.log(tab);
           return issue.labels.some(label => label.name === tab);
         });
 

@@ -143,13 +143,13 @@ export const IssuesPage = () => {
       initSetting();
     }
     const scrollableDiv = document.getElementById('scrollableDiv');
+    // prevent list not overflow the scrollable div not load more issues
     if (
       hasMoreRef.current &&
       tabIssues.length !== 0 &&
       scrollableDiv &&
       scrollableDiv.scrollHeight <= scrollableDiv.clientHeight
     ) {
-      console.log('hi');
       loadMoreIssues();
     }
     //TODO: move isEmpty to context

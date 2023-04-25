@@ -1,12 +1,13 @@
 import { GetIssueType, RepoType } from '@src/models/IssueType';
 import { UserType } from '@src/models/UserType';
 
+//format user data
 export const formatUser = (user: any): UserType | UserType[] => {
   if (user instanceof Array) {
     return user.map((user: any) => {
       return {
         id: user.id,
-        name: user.name,
+        name: user.name || user.login,
         accountName: user.login,
         avatarUrl: user.avatar_url,
       };
@@ -14,12 +15,13 @@ export const formatUser = (user: any): UserType | UserType[] => {
   }
   return {
     id: user.id,
-    name: user.name,
+    name: user.name || user.login,
     accountName: user.login,
     avatarUrl: user.avatar_url,
   };
 };
 
+//format repo data
 export const formatRepo = (repo: any): RepoType => {
   if (repo instanceof String) {
     return {
@@ -34,6 +36,7 @@ export const formatRepo = (repo: any): RepoType => {
   };
 };
 
+//format issue data
 export const formatIssue = (issue: any): GetIssueType => {
   const formattAssignees: UserType[] = formatUser(
     issue.assignees
@@ -56,4 +59,11 @@ export const formatIssue = (issue: any): GetIssueType => {
     closed_at: issue.closed_at,
     repository: formattedRepo,
   };
+};
+
+//format date
+export const formatDate = (date: string): string => {
+  const formatDate = new Date(date).toLocaleDateString();
+  const formatTime = new Date(date).toLocaleTimeString();
+  return `${formatDate}  ${formatTime}`;
 };

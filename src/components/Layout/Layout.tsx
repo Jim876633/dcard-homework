@@ -12,7 +12,6 @@ export const LayoutElement = () => {
   const { selectTab } = useIssuesContext();
 
   const navClickHandler = ({ key }: MenuInfo) => {
-    console.log(key);
     switch (key) {
       case LabelTabEnum.ALL:
         selectTab(LabelOptionEnum.ALL);

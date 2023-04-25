@@ -30,7 +30,7 @@ export const Routers = () => {
               path="/issues/detail/:detailId"
               element={<IssueDetailPage />}
               handle={{
-                crumb: (id: string) => (
+                crumb: (id: number) => (
                   <Link to={`/issues/detail/${id}`} state={{ id }}>
                     Detail
                   </Link>

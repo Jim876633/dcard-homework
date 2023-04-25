@@ -54,25 +54,6 @@ export const Issue = ({ issue }: props) => {
     }
   };
 
-  const onClickHandler = () => {
-    navigate(`/issues/detail/${issue.id}`, { state: issue });
-  };
-  //TODO: add it
-  // useEffect(() => {
-  //   if (issue.labels.length === 0) {
-  //     const setLabelToOpen = async () => {
-  //       if (accessToken) {
-  //         await githubApi.updateIssueLabels(
-  //           accessToken,
-  //           { labels: ['open'] },
-  //           updateParams
-  //         );
-  //       }
-  //     };
-  //     setLabelToOpen();
-  //   }
-  // }, []);
-
   return (
     <List.Item key={issue.id}>
       <List.Item.Meta
@@ -87,7 +68,8 @@ export const Issue = ({ issue }: props) => {
         description={issue.body}
       />
       <Select
-        defaultValue={issue.labels[0]?.name || LabelOptionEnum.OPEN}
+        defaultValue={issue.labels[0]?.name}
+        placeholder="Select label"
         style={{ width: 150, textAlign: 'left', marginRight: '1rem' }}
         onChange={selectChangeHandler}
         options={options}
