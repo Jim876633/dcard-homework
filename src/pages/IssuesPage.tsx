@@ -205,7 +205,7 @@ export const IssuesPage = () => {
           </InfiniteScroll>
         </div>
       </Spin>
-      <Button onClick={createIssueHandler} disabled={isLoading}>
+      <Button onClick={createIssueHandler} disabled={repos.length === 0}>
         Creat issues
       </Button>
     </div>
