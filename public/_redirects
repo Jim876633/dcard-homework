@@ -1,2 +1,2 @@
-/githubOauth/* https://jim-issues-tracker-server.netlify.app/githubOauth/:splat 200
+/githubOauth/* https://jim-issues-tracker-server.netlify.app/.netlify/functions/server/githubOauth/:splat 200
 /* /index.html 200
