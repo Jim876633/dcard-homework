@@ -1,5 +1,5 @@
-import { GetIssueType } from '@src/models/IssueType';
-import { Form, FormInstance, Input } from 'antd';
+import Input from 'antd/lib/input/Input';
+import Form, { FormInstance } from 'antd/lib/form';
 import { FieldData } from 'rc-field-form/lib/interface';
 
 interface props {

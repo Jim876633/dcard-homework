@@ -116,6 +116,22 @@ export const IssuesContextProvier = ({ children }: Props) => {
     }
   };
 
+  const updateIssueLabels = async (
+    label: string,
+    updateParams: UpdateParamsType
+  ) => {
+    if (accessToken) {
+      const updateLabel = await githubApi.updateIssueLabels(
+        accessToken,
+        { labels: [label] },
+        updateParams
+      );
+      if (updateLabel) {
+        getIssues();
+      }
+    }
+  };
+
   //TODO: select tab
   const selectTab = (tab: string) => {
     setTab(tab);
@@ -135,6 +151,7 @@ export const IssuesContextProvier = ({ children }: Props) => {
     getUser,
     searchIssues,
     updateIssue,
+    updateIssueLabels,
     getUserRepos,
     selectTab,
     tabIssues,
@@ -163,6 +180,10 @@ interface IssuesContextValue {
     issue: UpdateIssueType,
     updateParams: UpdateParamsType
   ) => Promise<GetIssueType | undefined>;
+  updateIssueLabels: (
+    label: string,
+    updateParams: UpdateParamsType
+  ) => Promise<void>;
   getUserRepos: () => Promise<string[] | undefined>;
   selectTab: (tab: string) => void;
   tabIssues: GetIssueType[];

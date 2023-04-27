@@ -100,7 +100,7 @@ const updateIssueLabels = async (
   labels: UpdateLabelsType,
   UpdateParams: UpdateParamsType
 ) => {
-  await fetch(
+  const res = await fetch(
     `/githubOauth/setLabels/${UpdateParams.owner}/${UpdateParams.repo}/${UpdateParams.issueNumber}`,
     {
       method: 'PUT',
@@ -111,6 +111,8 @@ const updateIssueLabels = async (
       body: JSON.stringify(labels),
     }
   );
+  const data = await res.json();
+  return data;
 };
 
 /**

@@ -1,11 +1,10 @@
 import { MoreOutlined } from '@ant-design/icons';
-import { useTokenContext } from '@src/context/useTokenContext';
+import { useIssuesContext } from '@src/context/useIssuesContext';
 import { LabelOptionEnum } from '@src/enums/labelEnum';
 import { GetIssueType, LabelName } from '@src/models/IssueType';
-import { githubApi } from '@src/services/github-api';
 import { Avatar, Button, List, Popover, Select } from 'antd';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from './Issue.module.scss';
 import { MoreAction } from './MoreAction';
 
@@ -31,8 +30,7 @@ const options = [
 export const Issue = ({ issue }: props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openMoreAction, setOpenMoreAction] = useState(false);
-  const { accessToken } = useTokenContext();
-  const navigate = useNavigate();
+  const { updateIssueLabels } = useIssuesContext();
 
   const updateParams = {
     owner: issue.user.accountName,
@@ -45,13 +43,7 @@ export const Issue = ({ issue }: props) => {
   };
 
   const selectChangeHandler = async (value: LabelName) => {
-    if (accessToken) {
-      await githubApi.updateIssueLabels(
-        accessToken,
-        { labels: [value] },
-        updateParams
-      );
-    }
+    await updateIssueLabels(value, updateParams);
   };
 
   return (
